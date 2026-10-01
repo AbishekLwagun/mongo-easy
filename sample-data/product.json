@@ -1,0 +1,58 @@
+[
+  {
+    "product_id": 2001,
+    "name": "Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 89.99,
+    "stock": 42
+  },
+  {
+    "product_id": 2002,
+    "name": "Wireless Mouse",
+    "category": "Electronics",
+    "price": 34.99,
+    "stock": 75
+  },
+  {
+    "product_id": 2003,
+    "name": "USB-C Hub",
+    "category": "Electronics",
+    "price": 49.99,
+    "stock": 31
+  },
+  {
+    "product_id": 2004,
+    "name": "27-inch Monitor",
+    "category": "Electronics",
+    "price": 249.99,
+    "stock": 18
+  },
+  {
+    "product_id": 2005,
+    "name": "Laptop Stand",
+    "category": "Office",
+    "price": 59.99,
+    "stock": 27
+  },
+  {
+    "product_id": 2006,
+    "name": "Webcam",
+    "category": "Electronics",
+    "price": 69.99,
+    "stock": 23
+  },
+  {
+    "product_id": 2007,
+    "name": "Desk Lamp",
+    "category": "Office",
+    "price": 39.99,
+    "stock": 36
+  },
+  {
+    "product_id": 2008,
+    "name": "Notebook",
+    "category": "Office",
+    "price": 8.99,
+    "stock": 120
+  }
+]

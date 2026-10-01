@@ -1,0 +1,42 @@
+[
+  {
+    "customer_id": 1002,
+    "name": "Sarah Johnson",
+    "email": "sarah.johnson@example.com",
+    "city": "St. Paul",
+    "state": "MN",
+    "status": "active"
+  },
+  {
+    "customer_id": 1003,
+    "name": "Michael Chen",
+    "email": "michael.chen@example.com",
+    "city": "Madison",
+    "state": "WI",
+    "status": "inactive"
+  },
+  {
+    "customer_id": 1005,
+    "name": "David Kim",
+    "email": "david.kim@example.com",
+    "city": "Des Moines",
+    "state": "IA",
+    "status": "active"
+  },
+  {
+    "customer_id": 1009,
+    "name": "Noah Williams",
+    "email": "noah.williams@example.com",
+    "city": "Phoenix",
+    "state": "AZ",
+    "status": "active"
+  },
+  {
+    "customer_id": 1010,
+    "name": "Emma Davis",
+    "email": "emma.davis@example.com",
+    "city": "Seattle",
+    "state": "WA",
+    "status": "active"
+  }
+]

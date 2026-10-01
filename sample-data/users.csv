@@ -1,0 +1,7 @@
+user_id,username,email,role,status,department
+1,admin,admin@example.com,admin,active,IT
+2,sarah.j,sarah.j@example.com,manager,active,Sales
+3,mchen,mchen@example.com,analyst,active,Finance
+4,emily.r,emily.r@example.com,support,active,Customer Support
+5,dkim,dkim@example.com,developer,inactive,Engineering
+6,olivia.b,olivia.b@example.com,analyst,active,Marketing

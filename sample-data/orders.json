@@ -1,0 +1,101 @@
+[
+  {
+    "order_id": 5001,
+    "customer_id": 1001,
+    "order_date": "2026-09-01",
+    "status": "shipped",
+    "items": [
+      {
+        "product_id": 2001,
+        "quantity": 1,
+        "price": 89.99
+      }
+    ],
+    "total": 89.99
+  },
+  {
+    "order_id": 5002,
+    "customer_id": 1002,
+    "order_date": "2026-09-03",
+    "status": "delivered",
+    "items": [
+      {
+        "product_id": 2002,
+        "quantity": 2,
+        "price": 34.99
+      }
+    ],
+    "total": 69.98
+  },
+  {
+    "order_id": 5003,
+    "customer_id": 1003,
+    "order_date": "2026-09-05",
+    "status": "processing",
+    "items": [
+      {
+        "product_id": 2004,
+        "quantity": 1,
+        "price": 249.99
+      },
+      {
+        "product_id": 2003,
+        "quantity": 1,
+        "price": 49.99
+      }
+    ],
+    "total": 299.98
+  },
+  {
+    "order_id": 5004,
+    "customer_id": 1004,
+    "order_date": "2026-09-07",
+    "status": "delivered",
+    "items": [
+      {
+        "product_id": 2005,
+        "quantity": 1,
+        "price": 59.99
+      },
+      {
+        "product_id": 2008,
+        "quantity": 3,
+        "price": 8.99
+      }
+    ],
+    "total": 86.96
+  },
+  {
+    "order_id": 5005,
+    "customer_id": 1006,
+    "order_date": "2026-09-10",
+    "status": "shipped",
+    "items": [
+      {
+        "product_id": 2006,
+        "quantity": 1,
+        "price": 69.99
+      },
+      {
+        "product_id": 2002,
+        "quantity": 1,
+        "price": 34.99
+      }
+    ],
+    "total": 104.98
+  },
+  {
+    "order_id": 5006,
+    "customer_id": 1007,
+    "order_date": "2026-09-12",
+    "status": "cancelled",
+    "items": [
+      {
+        "product_id": 2007,
+        "quantity": 2,
+        "price": 39.99
+      }
+    ],
+    "total": 79.98
+  }
+]

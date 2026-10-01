@@ -1,0 +1,6 @@
+{"user_id": 1, "username": "admin", "email": "admin@example.com", "role": "admin", "status": "active", "department": "IT"}
+{"user_id": 7, "username": "jwilson", "email": "jwilson@example.com", "role": "developer", "status": "active", "department": "Engineering"}
+{"user_id": 8, "username": "sophia.p", "email": "sophia.p@example.com", "role": "designer", "status": "active", "department": "Product"}
+{"user_id": 9, "username": "noah.w", "email": "noah.w@example.com", "role": "analyst", "status": "active", "department": "Finance"}
+{"user_id": 10, "username": "emma.d", "email": "emma.d@example.com", "role": "support", "status": "active", "department": "Customer Support"}
+{"user_id": 11, "username": "liam.t", "email": "liam.t@example.com", "role": "developer", "status": "active", "department": "Engineering"}
