@@ -761,6 +761,14 @@ It just needs to solve a real problem well.
 
 ---
 
+## Feedback and Issues
+
+Mongo Easy is actively being improved based on real-world usage.
+
+If you find a bug, encounter confusing behavior, or have an idea for a new feature, please [open an issue on GitHub](https://github.com/AbishekLwagun/mongo-easy/issues).
+
+Feedback is welcome and will help shape future releases.
+
 ## About the Author
 
 ### Built by Abishek Lwagun
