@@ -39,6 +39,7 @@ Mongo Easy supports:
 - Multiple files targeting the same collection
 - Safe handling of existing collection data
 - Clear terminal feedback
+- Database selection from the CLI
 - Input validation before importing
 
 The goal is not to replace MongoDB's official tools.
@@ -83,7 +84,7 @@ It is also a project I used to learn more about:
 ### Replace a collection
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.json --mode replace
+mongo-easy import .\sample-data\customer.json --mode replace
 ```
 
 ```text
@@ -94,13 +95,13 @@ Mongo Easy
 • Replacing collection: customer
 ✔ Imported 5 documents
 
-Done.
+✔✔✔ Done.
 ```
 
 ### Upsert a dataset
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.jsonl --mode upsert
+mongo-easy import .\sample-data\customer.jsonl --mode upsert
 ```
 
 ```text
@@ -113,7 +114,7 @@ Upsert key: automatic detection
 • Upsert key: customer_id
 ✔ Inserted 0, updated 0, already existed 5
 
-Done.
+✔✔✔ Done.
 ```
 
 ---
@@ -136,7 +137,7 @@ This is the default behavior.
 If the collection already contains documents and no explicit mode is provided, Mongo Easy does not guess what you want.
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.json
+mongo-easy import .\sample-data\customer.json
 ```
 
 Instead, it tells you to explicitly choose:
@@ -156,7 +157,7 @@ I added this behavior because an import tool should not unexpectedly delete or m
 Adds the new documents to the existing collection.
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.json --mode append
+mongo-easy import .\sample-data\customer.json --mode append
 ```
 
 ---
@@ -166,7 +167,7 @@ Adds the new documents to the existing collection.
 Drops the existing collection and imports the new documents.
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.json --mode replace
+mongo-easy import .\sample-data\customer.json --mode replace
 ```
 
 Because this can remove existing data, it requires an explicit `--mode replace`.
@@ -181,7 +182,7 @@ Upsert means:
 - insert it if the key does not exist
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.jsonl --mode upsert
+mongo-easy import .\sample-data\customer.jsonl --mode upsert
 ```
 
 Mongo Easy can automatically look for a suitable key.
@@ -208,8 +209,32 @@ If no safe key can be found, Mongo Easy stops instead of guessing.
 You can also provide the key yourself:
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.jsonl --mode upsert --key customer_id
+mongo-easy import .\sample-data\customer.jsonl --mode upsert --key customer_id
 ```
+
+---
+
+## Database Selection
+
+Mongo Easy uses the `mongo-easy` database by default.
+
+```powershell
+mongo-easy import .\sample-data\customer.json --mode replace
+```
+
+You can choose a different database with `--database`:
+
+```powershell
+mongo-easy import .\sample-data\customer.json --database analytics --mode replace
+```
+
+The shorter `-db` option is also supported:
+
+```powershell
+mongo-easy import .\sample-data\customer.json -db analytics --mode replace
+```
+
+This makes it possible to import datasets into different MongoDB databases without changing the source code.
 
 ---
 
@@ -265,7 +290,7 @@ One of the reasons I built Mongo Easy was to make working with a complete datase
 Instead of importing each file individually, a ZIP archive can be passed directly to the tool.
 
 ```powershell
-.\mongo-easy.exe import .\sample-datasets.zip --mode replace --collection-mode combine
+mongo-easy import .\sample-datasets.zip --mode replace --collection-mode combine
 ```
 
 For example:
@@ -332,7 +357,7 @@ Mongo Easy provides three options.
 Example:
 
 ```powershell
-.\mongo-easy.exe import .\sample-datasets.zip --mode replace --collection-mode combine
+mongo-easy import .\sample-datasets.zip --mode replace --collection-mode combine
 ```
 
 ---
@@ -378,6 +403,7 @@ mongo-easy/
 │
 ├── go.mod
 ├── go.sum
+├── setup.py
 ├── LICENSE
 └── README.md
 ```
@@ -429,27 +455,91 @@ This separation also makes individual parts easier to test.
 
 ## Requirements
 
-- Go
+To run Mongo Easy:
+
 - MongoDB running locally
 - Windows, macOS, or Linux
 
-The current development configuration connects to:
+The current MongoDB connection is:
 
 ```text
 mongodb://localhost:27017
 ```
 
-The database used by Mongo Easy is:
+Mongo Easy uses the following database by default:
 
 ```text
 mongo-easy
 ```
 
-The connection string and database name are currently defined in the source code.
+A different database can be selected with `--database` or `-db`.
+
+For example:
+
+```powershell
+mongo-easy import .\data.json --database analytics --mode replace
+```
+
+To build Mongo Easy from source, Go is also required.
+
+The optional Windows `setup.py` script requires Python.
+
+## Installation
+
+### Windows
+
+Download and extract the Windows release of Mongo Easy.
+
+The package contains:
+
+```text
+mongo-easy.exe
+setup.py
+README.md
+LICENSE
+```
+
+You can run Mongo Easy directly from the extracted folder:
+
+```powershell
+mongo-easy --help
+```
+
+### Add Mongo Easy to PATH
+
+Mongo Easy includes an optional setup script that can add the folder containing `mongo-easy.exe` to your Windows user PATH.
+
+Run:
+
+```powershell
+python .\setup.py
+```
+
+The setup script will ask:
+
+```text
+Add Mongo Easy to your user PATH? [Y/n]:
+```
+
+Choose `Y`, then close PowerShell and open a new PowerShell window.
+
+You can then run Mongo Easy from any directory:
+
+```powershell
+mongo-easy --help
+```
+
+For example:
+
+```powershell
+mongo-easy import "C:\path\to\data.zip" --database analytics --mode replace
+```
+
+The PATH change is made for the current Windows user and does not require administrator privileges.
 
 ---
 
-## Build
+## Build from Source
 
 Clone the repository:
 
@@ -467,13 +557,13 @@ go build -o mongo-easy ./cmd/mongo-easy
 ### Windows PowerShell
 
 ```powershell
-go build -o .\mongo-easy.exe .\cmd\mongo-easy
+go build -o mongo-easy .\cmd\mongo-easy
 ```
 
 Check the available commands:
 
 ```powershell
-.\mongo-easy.exe --help
+mongo-easy --help
 ```
 
 ---
@@ -485,31 +575,31 @@ The repository includes sample datasets so the project can be tested without cre
 ### Replace
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.json --mode replace
+mongo-easy import .\sample-data\customer.json --mode replace
 ```
 
 ### Append
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\product.json --mode append
+mongo-easy import .\sample-data\product.json --mode append
 ```
 
 ### Upsert with automatic key detection
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.jsonl --mode upsert
+mongo-easy import .\sample-data\customer.jsonl --mode upsert
 ```
 
 ### Upsert with an explicit key
 
 ```powershell
-.\mongo-easy.exe import .\sample-data\customer.jsonl --mode upsert --key customer_id
+mongo-easy import .\sample-data\customer.jsonl --mode upsert --key customer_id
 ```
 
 ### Import the complete sample archive
 
 ```powershell
-.\mongo-easy.exe import .\sample-datasets.zip --mode replace --collection-mode combine
+mongo-easy import .\sample-datasets.zip --mode replace --collection-mode combine
 ```
 
 A simple way to see the upsert behavior is to run a dataset with `replace` first and then run the same dataset with `upsert`.
@@ -564,7 +654,7 @@ gofmt -w .
 Build the application:
 
 ```powershell
-go build -o .\mongo-easy.exe .\cmd\mongo-easy
+go build -o mongo-easy .\cmd\mongo-easy
 ```
 
 The repository includes unit tests for:
@@ -636,7 +726,6 @@ These are intentional areas for future development rather than hidden limitation
 Some of the next improvements I would like to work on:
 
 - Configurable MongoDB connection strings
-- Database selection from the CLI
 - Dry-run imports
 - Better validation and error messages
 - Progress reporting for large imports
@@ -698,7 +787,7 @@ See [`LICENSE`](LICENSE) for the complete license text.
 
 ## Project Status
 
-**Active development**
+**Usable — active development**
 
 Mongo Easy is currently usable for local dataset imports. Future development will focus on configuration, dry-run support, larger dataset handling, integration testing, and cross-platform release builds.
 

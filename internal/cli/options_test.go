@@ -144,3 +144,59 @@ func TestParseUpsertKey(t *testing.T) {
 		t.Fatalf("got %q, want customer_id", got)
 	}
 }
+
+func TestParseDatabase(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    []string
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "default",
+			args: nil,
+			want: "mongo-easy",
+		},
+		{
+			name: "database option",
+			args: []string{"--database", "analytics"},
+			want: "analytics",
+		},
+		{
+			name: "short database option",
+			args: []string{"-db", "analytics"},
+			want: "analytics",
+		},
+		{
+			name:    "missing value",
+			args:    []string{"--database"},
+			wantErr: true,
+		},
+		{
+			name:    "missing value short option",
+			args:    []string{"-db"},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseDatabase(tt.args)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if got != tt.want {
+				t.Fatalf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

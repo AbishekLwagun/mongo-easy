@@ -12,16 +12,17 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func importZIP(database *mongo.Database, path string, options Options) error {
+func importZIP(database *mongo.Database, path string, options Options) (bool, error) {
 	reader, err := zip.OpenReader(path)
 	if err != nil {
-		return fmt.Errorf("could not open ZIP file: %w", err)
+		return false, fmt.Errorf("could not open ZIP file: %w", err)
 	}
 	defer reader.Close()
 
 	collections := make(map[string][]parser.Document)
 	cancelled := make(map[string]bool)
 	fileCount := 0
+	importedAny := false
 
 	fmt.Println("Files in archive:")
 
@@ -35,30 +36,32 @@ func importZIP(database *mongo.Database, path string, options Options) error {
 
 		content, err := file.Open()
 		if err != nil {
-			return fmt.Errorf("could not open file: %s", file.Name)
+			return false, fmt.Errorf("could not open file: %s", file.Name)
 		}
 
 		data, readErr := io.ReadAll(content)
 		closeErr := content.Close()
+
 		if readErr != nil {
-			return fmt.Errorf("could not read file: %s", file.Name)
+			return false, fmt.Errorf("could not read file: %s", file.Name)
 		}
+
 		if closeErr != nil {
-			return fmt.Errorf("could not close file: %s", file.Name)
+			return false, fmt.Errorf("could not close file: %s", file.Name)
 		}
 
 		documents, err := parser.Parse(data, extension)
 		if err != nil {
-			return fmt.Errorf("%s: %w", file.Name, err)
+			return false, fmt.Errorf("%s: %w", file.Name, err)
 		}
 
 		fileCount++
 
-		if existing, exists := collections[collection]; exists {
+		if _, exists := collections[collection]; exists {
 			// Decide what to do when multiple files use the same collection name.
 			switch options.CollectionMode {
 			case cli.CollectionModeCombine:
-				// Keep the original collection and add the new documents below.
+				// Keep the same collection and add the new documents below.
 
 			case cli.CollectionModeCancel:
 				fmt.Println("Import cancelled for collection:", collection)
@@ -77,20 +80,26 @@ func importZIP(database *mongo.Database, path string, options Options) error {
 			case cli.CollectionModeSeparate:
 				separateCollection := collection + "_" + strings.TrimPrefix(extension, ".")
 				fmt.Println("Creating separate collection:", separateCollection)
+
 				collections[separateCollection] = append(
 					collections[separateCollection],
 					documents...,
 				)
+
 				continue
 
 			default:
-				return fmt.Errorf("unsupported collection mode: %s", options.CollectionMode)
+				return false, fmt.Errorf(
+					"unsupported collection mode: %s",
+					options.CollectionMode,
+				)
 			}
-
-			_ = existing
 		}
 
-		collections[collection] = append(collections[collection], documents...)
+		collections[collection] = append(
+			collections[collection],
+			documents...,
+		)
 	}
 
 	fmt.Println("Total files:", fileCount)
@@ -101,10 +110,23 @@ func importZIP(database *mongo.Database, path string, options Options) error {
 			continue
 		}
 
-		if err := importCollection(database, collectionName, documents, options); err != nil {
+		// Import the collection and check if it was cancelled.
+		imported, err := importCollection(
+			database,
+			collectionName,
+			documents,
+			options,
+		)
+
+		if err != nil {
 			fmt.Println("Error:", err)
+			continue
+		}
+
+		if imported {
+			importedAny = true
 		}
 	}
 
-	return nil
+	return importedAny, nil
 }

@@ -42,7 +42,7 @@ func Warning(message string) {
 
 func Done() {
 	fmt.Println()
-	fmt.Println("Done.")
+	fmt.Println("✔✔✔ Done.")
 }
 
 func StartSpinner(message string) *Spinner {

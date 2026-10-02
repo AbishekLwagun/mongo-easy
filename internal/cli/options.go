@@ -1,6 +1,8 @@
 package cli
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ImportMode string
 
@@ -93,4 +95,24 @@ func ParseUpsertKey(args []string) string {
 	}
 
 	return ""
+}
+func ParseDatabase(args []string) (string, error) {
+	database := "mongo-easy"
+
+	// Check the command line for the database option.
+	for i := 0; i < len(args); i++ {
+		if args[i] != "--database" && args[i] != "-db" {
+			continue
+		}
+
+		// Make sure the user gives a database name.
+		if i+1 >= len(args) {
+			return "", fmt.Errorf("%s requires a value", args[i])
+		}
+
+		database = args[i+1]
+		i++
+	}
+
+	return database, nil
 }

@@ -20,6 +20,10 @@ func PrintHelp() {
 	fmt.Println("  --key <field>")
 	fmt.Println("      Specify the field to use as the upsert key")
 	fmt.Println()
+	fmt.Println("  --database <name>, -db <name>")
+	fmt.Println("      Select the MongoDB database to use")
+	fmt.Println("      Default: mongo-easy")
+	fmt.Println()
 	fmt.Println("  --collection-mode <mode>")
 	fmt.Println("      ask       Ask when multiple files target the same collection")
 	fmt.Println("      combine   Combine multiple files into one collection")
@@ -38,4 +42,5 @@ func PrintHelp() {
 	fmt.Println("  mongo-easy import data.zip --mode upsert")
 	fmt.Println("  mongo-easy import data.zip --mode replace --collection-mode separate")
 	fmt.Println("  mongo-easy import data.json --mode upsert --key customer_id")
+	fmt.Println("  mongo-easy import data.json --database analytics --mode replace")
 }

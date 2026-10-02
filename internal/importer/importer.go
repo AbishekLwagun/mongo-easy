@@ -17,31 +17,36 @@ type Options struct {
 	UpsertKey      string
 }
 
-func Run(database *mongo.Database, path, extension string, options Options) error {
+func Run(database *mongo.Database, path, extension string, options Options) (bool, error) {
 	// ZIP files need to be handled differently because they can contain multiple files.
 	if extension == ".zip" {
 		return importZIP(database, path, options)
 	}
 
+	// Normal files are handled by the regular file importer.
 	return importFile(database, path, extension, options)
 }
-
-func importFile(database *mongo.Database, path, extension string, options Options) error {
+func importFile(database *mongo.Database, path, extension string, options Options) (bool, error) {
+	// Read the dataset file.
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return fmt.Errorf("could not read file: %s", path)
+		return false, fmt.Errorf("could not read file: %s", path)
 	}
 
+	// Parse the file into MongoDB documents.
 	documents, err := parser.Parse(data, extension)
 	if err != nil {
-		return err
+		return false, err
 	}
 
+	// Use the file name as the collection name.
 	collectionName := parser.CollectionName(path)
 	ui.Info(fmt.Sprintf("Collection: %s", collectionName))
 	ui.Info(fmt.Sprintf("Documents ready for import: %d", len(documents)))
 
-	return importCollection(database, collectionName, documents, options)
+	// Import the documents and return whether the import happened.
+	imported, err := importCollection(database, collectionName, documents, options)
+	return imported, err
 }
 
 func importCollection(
@@ -49,12 +54,12 @@ func importCollection(
 	collectionName string,
 	documents []parser.Document,
 	options Options,
-) error {
+) (bool, error) {
 	if options.Mode == cli.ImportModeAsk {
 		// Check the collection first so we do not add data without the user choosing a mode.
 		hasDocuments, err := mongodb.HasDocuments(database, collectionName)
 		if err != nil {
-			return fmt.Errorf("could not check collection: %w", err)
+			return false, fmt.Errorf("could not check collection: %w", err)
 		}
 
 		if hasDocuments {
@@ -64,7 +69,7 @@ func importCollection(
 			fmt.Println("  --mode append")
 			fmt.Println("  --mode replace")
 			fmt.Println("  --mode upsert")
-			return nil
+			return false, nil
 		}
 	}
 
@@ -73,7 +78,7 @@ func importCollection(
 		ui.Info(fmt.Sprintf("Replacing collection: %s", collectionName))
 
 		if err := mongodb.ReplaceCollection(database, collectionName, documents); err != nil {
-			return fmt.Errorf("could not import documents: %w", err)
+			return false, fmt.Errorf("could not import documents: %w", err)
 		}
 
 		ui.Success(fmt.Sprintf("Imported %d documents", len(documents)))
@@ -87,7 +92,7 @@ func importCollection(
 			var err error
 			key, err = DetectUpsertKey(documents)
 			if err != nil {
-				return err
+				return false, err
 			}
 		}
 
@@ -103,7 +108,7 @@ func importCollection(
 		)
 		if err != nil {
 			spinner.StopError("Import failed")
-			return fmt.Errorf("could not import documents: %w", err)
+			return false, fmt.Errorf("could not import documents: %w", err)
 		}
 
 		spinner.StopSuccess(
@@ -114,21 +119,21 @@ func importCollection(
 		ui.Info(fmt.Sprintf("Appending to collection: %s", collectionName))
 
 		if err := mongodb.InsertDocuments(database, collectionName, documents); err != nil {
-			return fmt.Errorf("could not import documents: %w", err)
+			return false, fmt.Errorf("could not import documents: %w", err)
 		}
 
 		ui.Success(fmt.Sprintf("Appended %d documents", len(documents)))
 
 	case cli.ImportModeAsk:
 		if err := mongodb.InsertDocuments(database, collectionName, documents); err != nil {
-			return fmt.Errorf("could not import documents: %w", err)
+			return false, fmt.Errorf("could not import documents: %w", err)
 		}
 
 		ui.Success(fmt.Sprintf("Imported %d documents", len(documents)))
 
 	default:
-		return fmt.Errorf("unsupported import mode: %s", options.Mode)
+		return false, fmt.Errorf("unsupported import mode: %s", options.Mode)
 	}
 
-	return nil
+	return true, nil
 }

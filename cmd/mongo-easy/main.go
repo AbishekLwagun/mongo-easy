@@ -12,8 +12,6 @@ import (
 	"github.com/abisheklwagun/mongo-easy/internal/ui"
 )
 
-const databaseName = "mongo-easy"
-
 func main() {
 	// Show the help message when no command or a help flag is provided.
 	if len(os.Args) < 2 || os.Args[1] == "--help" || os.Args[1] == "-h" {
@@ -58,6 +56,12 @@ func main() {
 
 	upsertKey := cli.ParseUpsertKey(args)
 
+	databaseName, err := cli.ParseDatabase(args)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
 	// Connect to MongoDB before starting the import.
 	client, err := mongodb.Connect()
 	if err != nil {
@@ -96,18 +100,25 @@ func main() {
 
 	// The importer handles the actual parsing and MongoDB import.
 	// The file extension tells it which type of file it is dealing with.
-	if err := importer.Run(
+	imported, err := importer.Run(
 		database,
 		path,
 		filepath.Ext(path),
 		options,
-	); err != nil {
+	)
+
+	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	// Show the final message only after the import finishes successfully.
-	ui.Done()
+	// Show the final message only when at least one collection was imported.
+	if imported {
+		ui.Done()
+	} else {
+		ui.Warning("No collections were imported.")
+	}
+
 }
 
 // validateDataset checks the input before the import starts.
